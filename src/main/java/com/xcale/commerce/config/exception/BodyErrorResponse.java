@@ -14,63 +14,64 @@ import java.util.List;
 @Getter
 @Setter
 public class BodyErrorResponse {
-    private HttpStatus status;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private LocalDateTime timestamp;
-    private String message;
-    private String debugMessage;
-    private List<BodySubErrorResponse> subErrors;
+  private HttpStatus status;
 
-    private BodyErrorResponse() {
-        timestamp = LocalDateTime.now();
-    }
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private LocalDateTime timestamp;
 
-    public BodyErrorResponse(HttpStatus status) {
-        this();
-        this.status = status;
-    }
+  private String message;
+  private String debugMessage;
+  private List<BodySubErrorResponse> subErrors;
 
-    public BodyErrorResponse(HttpStatus status, String message, Throwable ex) {
-        this();
-        this.status = status;
-        this.message = message;
-        this.debugMessage = ex.getLocalizedMessage();
-    }
+  private BodyErrorResponse() {
+    timestamp = LocalDateTime.now();
+  }
 
-    private void addSubError(BodySubErrorResponse subError) {
-        if (subErrors == null) {
-            subErrors = new ArrayList<>();
-        }
-        subErrors.add(subError);
-    }
+  public BodyErrorResponse(HttpStatus status) {
+    this();
+    this.status = status;
+  }
 
-    private void addValidationError(String object, String field, Object rejectedValue, String message) {
-        addSubError(new BodyValidationErrorResponse(object, field, rejectedValue, message));
-    }
+  public BodyErrorResponse(HttpStatus status, String message, Throwable ex) {
+    this();
+    this.status = status;
+    this.message = message;
+    this.debugMessage = ex.getLocalizedMessage();
+  }
 
-    private void addValidationError(String object, String message) {
-        addSubError(new BodyValidationErrorResponse(object, message));
+  private void addSubError(BodySubErrorResponse subError) {
+    if (subErrors == null) {
+      subErrors = new ArrayList<>();
     }
+    subErrors.add(subError);
+  }
 
-    private void addValidationError(FieldError fieldError) {
-        this.addValidationError(
-                fieldError.getObjectName(),
-                fieldError.getField(),
-                fieldError.getRejectedValue(),
-                fieldError.getDefaultMessage());
-    }
+  private void addValidationError(
+      String object, String field, Object rejectedValue, String message) {
+    addSubError(new BodyValidationErrorResponse(object, field, rejectedValue, message));
+  }
 
-    public void addValidationErrors(List<FieldError> fieldErrors) {
-        fieldErrors.forEach(this::addValidationError);
-    }
+  private void addValidationError(String object, String message) {
+    addSubError(new BodyValidationErrorResponse(object, message));
+  }
 
-    private void addValidationError(ObjectError objectError) {
-        this.addValidationError(
-                objectError.getObjectName(),
-                objectError.getDefaultMessage());
-    }
+  private void addValidationError(FieldError fieldError) {
+    this.addValidationError(
+        fieldError.getObjectName(),
+        fieldError.getField(),
+        fieldError.getRejectedValue(),
+        fieldError.getDefaultMessage());
+  }
 
-    public void addValidationError(List<ObjectError> globalErrors) {
-        globalErrors.forEach(this::addValidationError);
-    }
+  public void addValidationErrors(List<FieldError> fieldErrors) {
+    fieldErrors.forEach(this::addValidationError);
+  }
+
+  private void addValidationError(ObjectError objectError) {
+    this.addValidationError(objectError.getObjectName(), objectError.getDefaultMessage());
+  }
+
+  public void addValidationError(List<ObjectError> globalErrors) {
+    globalErrors.forEach(this::addValidationError);
+  }
 }

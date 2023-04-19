@@ -20,7 +20,7 @@ public interface CartApi {
       tags = {"Cart Api"},
       responses = {
         @ApiResponse(
-            responseCode = "200",
+            responseCode = "201",
             description = "Create a cart",
             content =
                 @Content(

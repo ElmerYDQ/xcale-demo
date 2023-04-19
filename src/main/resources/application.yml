@@ -9,3 +9,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui-custom.html
     operations-sorter: method
+carts:
+  timer:
+    delay: 60000
+    expired: 2

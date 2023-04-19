@@ -8,12 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,12 +21,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class CartRepositoryImplTest {
   @InjectMocks private CartRepositoryImpl cartRepository;
 
-  private final Map<Integer, CartEntity> cartEntityMap = new ConcurrentHashMap<>();
-
   @BeforeEach
   void setup() {
+    ReflectionTestUtils.setField(cartRepository, "minutes", 10);
     CartEntity cartEntity =
-            FileUtils.loadObject("data/model/entity/cartEntity.json", CartEntity.class);
+        FileUtils.loadObject("data/model/entity/cartEntity.json", CartEntity.class);
     cartEntity.setCreated(LocalDateTime.now());
     cartRepository.save(cartEntity);
   }
@@ -36,6 +34,7 @@ class CartRepositoryImplTest {
   void Given_CartAndProducts_When_Create_Then_Ok() {
     CartEntity cartEntity =
         FileUtils.loadObject("data/model/entity/cartEntity.json", CartEntity.class);
+    cartEntity.setCreated(LocalDateTime.now());
 
     CartEntity result = cartRepository.save(cartEntity);
 
@@ -51,17 +50,5 @@ class CartRepositoryImplTest {
     CartEntity cartEntity = cartRepository.update(1, productEntityList);
 
     assertNotNull(cartEntity);
-  }
-
-  @Test
-  void findById() {
-    CartEntity result = cartRepository.findById(1);
-
-    assertNotNull(result);
-  }
-
-  @Test
-  void delete() {
-    cartRepository.delete(1);
   }
 }

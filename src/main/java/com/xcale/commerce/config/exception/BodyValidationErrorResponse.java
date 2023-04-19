@@ -10,13 +10,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BodyValidationErrorResponse extends BodySubErrorResponse {
-    private String object;
-    private String field;
-    private Object rejectedValue;
-    private String message;
+  private String object;
+  private String field;
+  private Object rejectedValue;
+  private String message;
 
-    BodyValidationErrorResponse(String object, String message) {
-        this.object = object;
-        this.message = message;
-    }
+  BodyValidationErrorResponse(String object, String message) {
+    this.object = object;
+    this.message = message;
+  }
 }

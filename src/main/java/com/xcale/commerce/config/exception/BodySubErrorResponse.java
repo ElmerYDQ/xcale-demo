@@ -1,4 +1,3 @@
 package com.xcale.commerce.config.exception;
 
-public abstract class BodySubErrorResponse {
-}
+public abstract class BodySubErrorResponse {}

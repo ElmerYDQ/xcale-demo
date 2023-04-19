@@ -5,6 +5,8 @@ import com.xcale.commerce.model.entity.CartEntity;
 import com.xcale.commerce.model.entity.ProductEntity;
 import com.xcale.commerce.repository.CartRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
 
@@ -17,9 +19,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Repository
+@RefreshScope
 public class CartRepositoryImpl implements CartRepository {
   private final Map<Integer, CartEntity> cartEntityMap = new ConcurrentHashMap<>();
   private static int id = 1;
+
+  @Value("${carts.timer.expired}")
+  private Integer minutes;
 
   @Override
   public CartEntity save(CartEntity cartEntity) {
@@ -53,13 +59,13 @@ public class CartRepositoryImpl implements CartRepository {
     cartEntityMap.remove(id);
   }
 
-  @Scheduled(fixedDelay = 60000)
+  @Scheduled(fixedDelayString = "${carts.timer.delay}")
   public void expireCarts() {
     log.info("Start expireCarts()");
     LocalDateTime now = LocalDateTime.now();
     cartEntityMap.forEach(
         (cartId, cart) -> {
-          if (Duration.between(cart.getCreated(), now).toMinutes() >= 2) {
+          if (Duration.between(cart.getCreated(), now).toMinutes() >= minutes) {
             delete(cart.getId());
           }
         });
